@@ -173,9 +173,10 @@ def mail_body(message):
                                 <tr>
                                   <td style="padding-right: 0px;padding-left: 0px;" align="center">
 
-                                    <a href='https://postimg.cc/bZB39K2Y' target='_blank'><img src='https://i.postimg.cc/bZB39K2Y/scanAPP.png' border='0' align="center" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 600px;"
-                                      width="600" alt='scan-APP-removebg-preview'/></a>
-
+                                    <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                      <h1 style="color: #ffffff; font-size: 48px; font-weight: bold; margin: 0; font-family: 'Cabin', sans-serif; letter-spacing: 2px;">MediScribe</h1>
+                                      <p style="color: #ffffff; font-size: 16px; margin: 10px 0 0 0; font-family: 'Cabin', sans-serif;">Your Prescription Management Partner</p>
+                                    </div>
 
                                   </td>
                                 </tr>
@@ -504,4 +505,64 @@ def mail_body(message):
   <!--[if IE]></div><![endif]-->
 </body>
 
+</html>"""
+
+
+def combined_mail_body(medicines_list, patient_name=""):
+    """HTML email with ALL medicines in one table."""
+    rows = ""
+    for med_name, dosage in medicines_list:
+        rows += f"""
+        <tr>
+          <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:15px;color:#333;">{med_name}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:15px;color:#555;">{dosage}</td>
+        </tr>"""
+
+    greeting = f"<p style='font-size:16px;color:#333;'>Dear <b>{patient_name}</b>,</p>" if patient_name and patient_name != "Not Mentioned" else ""
+
+    return f"""<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f9f9f9;font-family:'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:30px 0;">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+        <!-- Header -->
+        <tr><td style="background:linear-gradient(135deg,#6437b8,#764ba2);padding:30px 40px;text-align:center;">
+          <h1 style="color:#fff;margin:0;font-size:32px;letter-spacing:2px;">MediScribe</h1>
+          <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:14px;">Your Prescription Reminder</p>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="padding:30px 40px;">
+          {greeting}
+          <p style="font-size:15px;color:#555;margin-bottom:20px;">
+            Here is your daily medicine reminder. Please take your medicines as prescribed by your doctor.
+          </p>
+
+          <!-- Medicine Table -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eee;border-radius:8px;overflow:hidden;">
+            <tr style="background:#6437b8;">
+              <th style="padding:12px 14px;color:#fff;text-align:left;font-size:14px;">Medicine</th>
+              <th style="padding:12px 14px;color:#fff;text-align:left;font-size:14px;">Dosage &amp; Frequency</th>
+            </tr>
+            {rows}
+          </table>
+
+          <p style="font-size:13px;color:#888;margin-top:24px;">
+            💡 <i>Always take medicines with water unless directed otherwise. Consult your doctor if you experience any side effects.</i>
+          </p>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="background:#f0ebff;padding:20px 40px;text-align:center;">
+          <p style="color:#6437b8;font-size:13px;margin:0;font-weight:600;">MediScribe — Your Prescription Management Partner</p>
+          <p style="color:#999;font-size:11px;margin:6px 0 0;">This is an automated reminder. Do not reply to this email.</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
 </html>"""

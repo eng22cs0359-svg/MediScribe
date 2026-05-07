@@ -1,0 +1,91 @@
+╔══════════════════════════════════════════════════════════════╗
+║           ScanPlus Email Reminders - Quick Reference         ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────┐
+│ SETUP (First Time Only)                                      │
+└──────────────────────────────────────────────────────────────┘
+
+1. Get Gmail App Password:
+   → https://myaccount.google.com/security
+   → Enable 2-Step Verification
+   → Generate App Password for "Mail"
+
+2. Run Setup:
+   cd ScanPlus
+   python setup_email.py
+
+3. Test:
+   python test_email.py
+
+4. Restart Frontend:
+   cd frontend
+   python app.py
+
+┌──────────────────────────────────────────────────────────────┐
+│ USING EMAIL REMINDERS                                        │
+└──────────────────────────────────────────────────────────────┘
+
+1. Go to: http://127.0.0.1:8000/scan
+2. Upload prescription image
+3. Enter email address
+4. Click "Scan"
+5. Check email for confirmation
+
+┌──────────────────────────────────────────────────────────────┐
+│ HOW IT WORKS                                                 │
+└──────────────────────────────────────────────────────────────┘
+
+Medicine: Neurokind Plus - 30 days
+         ↓
+Immediate: "Remember to take: Neurokind Plus for 30 days"
+         ↓
+Daily: "Daily reminder: Neurokind Plus" (for 30 days)
+         ↓
+Stops: After 30 days
+
+┌──────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                              │
+└──────────────────────────────────────────────────────────────┘
+
+Problem: Authentication failed
+Fix: Use App Password, not regular Gmail password
+
+Problem: No email received
+Fix: Check spam folder, verify email address
+
+Problem: "Email not configured" warning
+Fix: Run setup_email.py and restart frontend
+
+┌──────────────────────────────────────────────────────────────┐
+│ QUICK COMMANDS                                               │
+└──────────────────────────────────────────────────────────────┘
+
+Setup:     python setup_email.py
+Test:      python test_email.py
+Check:     echo %email% (Windows) or echo $email (Linux/Mac)
+Restart:   cd frontend && python app.py
+
+┌──────────────────────────────────────────────────────────────┐
+│ IMPORTANT NOTES                                              │
+└──────────────────────────────────────────────────────────────┘
+
+✓ Email is OPTIONAL - app works without it
+✓ Must restart frontend after setup
+✓ Use Gmail App Password (16 characters)
+✓ 2-Step Verification required
+✓ Check spam folder for emails
+
+┌──────────────────────────────────────────────────────────────┐
+│ FILES                                                        │
+└──────────────────────────────────────────────────────────────┘
+
+setup_email.py              → Configure email
+test_email.py               → Test configuration
+EMAIL_ALERTS_GUIDE.md       → Full documentation
+SETUP_EMAIL_REMINDERS.md    → Quick start guide
+EMAIL_SETUP_COMPLETE.md     → What's been done
+
+╔══════════════════════════════════════════════════════════════╗
+║  Need help? See EMAIL_ALERTS_GUIDE.md for detailed guide    ║
+╚══════════════════════════════════════════════════════════════╝

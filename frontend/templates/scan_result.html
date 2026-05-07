@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>MediScribe - Results</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
@@ -26,8 +26,8 @@
 <body>
     <nav class="navbar navbar-expand-lg fixed-top flex-md-nowrap p-0 shadows white2" style="margin: 20px; margin-left: 150px;">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/">
-              <img src="../static/logo.png" alt="Bootstrap" width="170" height="40">
+          <a class="navbar-brand" href="/" style="font-size: 24px; font-weight: bold; color: #6437b8;">
+              MediScribe
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
@@ -43,50 +43,287 @@
                     <li class="nav-item">
                       <a class="nav-link" href="/contact">Contact</a>
                     </li>
+                    {% if from_dashboard %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    {% else %}
                     <li class="nav-item">
                       <a class="nav-link" href="/login">Login</a>
                     </li>
+                    {% endif %}
               </div>
           </div>
         </div>
     </nav>
 
+    {% if from_dashboard %}
+    <div style="text-align: center; margin-top: 80px; margin-bottom: 20px;">
+        <a href="/dashboard" class="btn btn-primary">← Back to Dashboard</a>
+    </div>
+    {% endif %}
+
     <ol class="result list-group list-group-numbered">
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="ms-2 me-auto">
-            <div class="fw-bold">Name</div>
-            {{name[0]}}
+            <div class="fw-bold">Patient Name</div>
+            <p style="font-size: 18px; margin-top: 10px;">{{name if name else 'Not detected'}}</p>
           </div>
-          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
         </li>
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="ms-2 me-auto">
-            <div class="fw-bold">Medicine & Dosage</div>
-                {% for i in medicine %}
-                {{i[0]}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {{i[1]}}
-                <br>
+            <div class="fw-bold">Medicines & Dosage</div>
+            <div style="margin-top: 10px;">
+                {% if medicine %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Medicine Name</th>
+                                <th>Dosage & Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in medicine %}
+                            <tr>
+                                <td>{{med[0]}}</td>
+                                <td>{{med[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No medicines detected</p>
+                {% endif %}
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+          <div class="ms-2 me-auto">
+            <div class="fw-bold">Additional Information</div>
+            <div style="margin-top: 10px;">
+                {% if 'Conditions' in output and output['Conditions'] %}
+                    <div style="margin-bottom: 10px;">
+                        <strong>Conditions:</strong>
+                        <ul>
+                            {% for condition in output['Conditions'] %}
+                                <li>{{condition}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                {% if 'Instructions' in output and output['Instructions'] %}
+                    <div style="margin-bottom: 10px;">
+                        <strong>Instructions:</strong>
+                        <ul>
+                            {% for instruction in output['Instructions'] %}
+                                <li>{{instruction}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                {% for key in output %}
+                    {% if key not in ['Medicines', 'Medicine', 'Dosage', 'Strength', 'Frequency', 'PatientInfo', 'PatientName', 'Name', 'Procedure', 'extracted_text', 'aws_raw', 'Conditions', 'Instructions'] %}
+                        <div style="margin-bottom: 10px;">
+                            <strong>{{key.replace('_', ' ').title()}}:</strong>
+                            <ul>
+                                {% if output[key] is mapping %}
+                                    {% for k, v in output[key].items() %}
+                                        <li>{{k}}: {{v}}</li>
+                                    {% endfor %}
+                                {% elif output[key] is iterable and output[key] is not string %}
+                                    {% for item in output[key] %}
+                                        {% if item is iterable and item is not string %}
+                                            <li>{{item[0] if item else item}}</li>
+                                        {% else %}
+                                            <li>{{item}}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <li>{{output[key]}}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 {% endfor %}
+            </div>
           </div>
-          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
         </li>
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="ms-2 me-auto">
-            <div class="fw-bold">Extracted Text</div>
-            {% for i in output %}
-            {{i}} = {{output[i]}}
-            <br>
-            {% endfor %}
+            <div class="fw-bold">Prescription Image</div>
+            <img src=../static/temp/{{pic}} width="700px" style="margin-top: 10px;">
           </div>
-          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
-        </li>
-        <li class="list-group-item d-flex justify-content-between align-items-start">
-          <div class="ms-2 me-auto">
-            <div class="fw-bold">Image</div>
-            <img src=../static/temp/{{pic}} width="700px">
-          </div>
-          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
         </li>
       </ol>
     
+<!-- ═══════════════════════════════════════════════════════════
+     AUTO-POPUP PRESCRIPTION SUMMARY MODAL
+═══════════════════════════════════════════════════════════ -->
+<div id="summary-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;width:90%;max-width:560px;max-height:80vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.25);">
+    <!-- Modal Header -->
+    <div style="background:linear-gradient(135deg,#6437b8,#764ba2);padding:18px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:17px;">💊 Prescription Summary</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:12px;">Powered by OpenFDA &amp; RxNorm</div>
+      </div>
+      <span onclick="closeSummary()" style="color:#fff;cursor:pointer;font-size:22px;line-height:1;">✕</span>
+    </div>
+    <!-- Modal Body -->
+    <div id="summary-content" style="padding:24px;font-size:14px;color:#333;line-height:1.7;">
+      <div style="text-align:center;color:#888;padding:20px;">⏳ Fetching medicine information...</div>
+    </div>
+    <div style="padding:0 24px 20px;text-align:right;">
+      <button onclick="closeSummary()" style="background:linear-gradient(135deg,#6437b8,#764ba2);color:#fff;border:none;border-radius:8px;padding:10px 24px;cursor:pointer;font-size:14px;">Got it ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AI AGENT CHATBOT WIDGET
+═══════════════════════════════════════════════════════════ -->
+<div id="chat-widget" style="position:fixed;bottom:24px;right:24px;z-index:9999;font-family:'Segoe UI',sans-serif;">
+  <button id="chat-toggle" onclick="toggleChat()"
+    style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6437b8,#764ba2);
+           border:none;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(100,55,184,0.4);">
+    💊
+  </button>
+  <div id="chat-box" style="display:none;width:350px;background:#fff;border-radius:16px;
+       box-shadow:0 8px 32px rgba(0,0,0,0.18);overflow:hidden;margin-bottom:12px;">
+    <div style="background:linear-gradient(135deg,#6437b8,#764ba2);padding:14px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700;font-size:15px;">💊 MediScribe Assistant</div>
+        <div style="font-size:11px;opacity:0.85;">Drug info • Reminders • Interactions</div>
+      </div>
+      <span onclick="toggleChat()" style="cursor:pointer;font-size:18px;">✕</span>
+    </div>
+    <div id="chat-messages" style="height:300px;overflow-y:auto;padding:14px;background:#f8f6ff;">
+      <div style="background:#ede9ff;border-radius:12px 12px 12px 2px;padding:10px 14px;margin-bottom:8px;font-size:13px;max-width:90%;color:#333;">
+        Hi! I'm your MediScribe assistant 👋<br>
+        Try asking:<br>
+        • <i>"Remind me at 8am"</i><br>
+        • <i>"Are these medicines safe together?"</i><br>
+        • <i>"Tell me about Augmentin"</i>
+      </div>
+    </div>
+    <!-- Quick action buttons -->
+    <div style="padding:8px 14px;background:#f0ebff;display:flex;gap:6px;flex-wrap:wrap;">
+      <button onclick="quickAsk('remind me at 8am')" style="font-size:11px;padding:4px 10px;border:1px solid #6437b8;border-radius:20px;background:#fff;color:#6437b8;cursor:pointer;">⏰ 8am reminder</button>
+      <button onclick="quickAsk('are these medicines safe together')" style="font-size:11px;padding:4px 10px;border:1px solid #6437b8;border-radius:20px;background:#fff;color:#6437b8;cursor:pointer;">🔍 Check interactions</button>
+      <button onclick="quickAsk('how to take these medicines')" style="font-size:11px;padding:4px 10px;border:1px solid #6437b8;border-radius:20px;background:#fff;color:#6437b8;cursor:pointer;">📋 How to take</button>
+    </div>
+    <div style="padding:6px 14px 0;background:#fff;">
+      <input id="chat-email" type="email" placeholder="Your email for reminders"
+        style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;box-sizing:border-box;">
+    </div>
+    <div style="display:flex;padding:8px 14px 14px;background:#fff;gap:8px;">
+      <input id="chat-input" type="text" placeholder="Ask me anything..."
+        onkeydown="if(event.key==='Enter') sendMessage()"
+        style="flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:10px;font-size:13px;outline:none;">
+      <button onclick="sendMessage()"
+        style="background:linear-gradient(135deg,#6437b8,#764ba2);color:#fff;border:none;
+               border-radius:10px;padding:9px 14px;cursor:pointer;font-size:14px;">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Medicines data from Jinja2 - use JSON.parse for safe JS injection
+  const medicinesData = JSON.parse('{{ medicine | tojson | safe }}').map(function(m) {
+    return { name: m[0] || '', dosage: m[1] || '' };
+  });
+
+  // ── Auto-popup summary on page load ──────────────────────────────────────
+  window.addEventListener('load', function() {
+    if (medicinesData.length > 0) {
+      setTimeout(showSummary, 800);
+    }
+  });
+
+  function showSummary() {
+    const modal = document.getElementById('summary-modal');
+    modal.style.display = 'flex';
+    fetch('/prescription-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ medicines: medicinesData })
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('summary-content').innerHTML = data.summary;
+    })
+    .catch(() => {
+      document.getElementById('summary-content').innerHTML =
+        'Your prescription has been scanned successfully. Always take medicines as directed by your doctor.';
+    });
+  }
+
+  function closeSummary() {
+    document.getElementById('summary-modal').style.display = 'none';
+  }
+
+  // ── Chatbot ───────────────────────────────────────────────────────────────
+  function toggleChat() {
+    const box = document.getElementById('chat-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function addMessage(text, isUser) {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.style.cssText = isUser
+      ? 'background:#6437b8;color:#fff;border-radius:12px 12px 2px 12px;padding:10px 14px;margin-bottom:8px;font-size:13px;max-width:90%;margin-left:auto;'
+      : 'background:#ede9ff;color:#333;border-radius:12px 12px 12px 2px;padding:10px 14px;margin-bottom:8px;font-size:13px;max-width:90%;';
+    div.innerHTML = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function quickAsk(text) {
+    document.getElementById('chat-input').value = text;
+    sendMessage();
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const emailInput = document.getElementById('chat-email');
+    const msg = input.value.trim();
+    if (!msg) return;
+    addMessage(msg, true);
+    input.value = '';
+
+    const msgs = document.getElementById('chat-messages');
+    const typing = document.createElement('div');
+    typing.id = 'typing';
+    typing.style.cssText = 'background:#ede9ff;color:#888;border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:13px;max-width:90%;';
+    typing.innerHTML = '⏳ Thinking...';
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    const emailVal = emailInput ? emailInput.value.trim() : '';
+
+    fetch('/agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        medicines: medicinesData,
+        email: emailVal
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('typing')?.remove();
+      addMessage(data.reply, false);
+    })
+    .catch(err => {
+      document.getElementById('typing')?.remove();
+      addMessage('Sorry, something went wrong. Error: ' + err.message, false);
+    });
+  }
+</script>
+
 </body>
 </html>

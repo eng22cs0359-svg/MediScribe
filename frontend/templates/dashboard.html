@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Document</title>
+    <title>MediScribe - Dashboard</title>
 
 
     <style>
@@ -474,7 +474,7 @@
               <div class="media d-flex align-items-center">
                   <img src="./static/pfp.png" alt="..." width="65" height="65" class="mr-3 rounded-circle img-thumbnail shadow-sm">
                   <div class="media-body">
-                    <p class="m-0" style="color: #515b9d; margin-bottom: 0px; margin-left: 20px; margin-top: -97px; font-size:90%;">  &nbsp; &nbsp; <b> John Doe </b> </p>
+                    <p class="m-0" style="color: #515b9d; margin-bottom: 0px; margin-left: 20px; margin-top: -97px; font-size:90%;">  &nbsp; &nbsp; <b> {{name if name else 'User'}} </b> </p>
             
             
                   </div>
@@ -485,20 +485,20 @@
       <ul class="nav flex-column mb-0">
     
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="/dashboard/upload" class="nav-link">
               <p style="color: rgb(112, 112, 112); margin-bottom: 0px; margin-left: 30px; font-size:88%;">  <i class="fa fa-th-large mr-3 fa-fw" style="color:#515b9d"> </i>  &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;  Upload </p>
             </a>
           </li>
 
   
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="/dashboard" class="nav-link">
               <p style="color: rgb(112, 112, 112); margin-bottom: 0px; margin-left: 30px; font-size:88%;">  <i class="fa fa-th-large mr-3 fa-fw" style="color:#515b9d"> </i>  &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;  Account </p>
             </a>
           </li>
   
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <a href="/logout" class="nav-link">
             <p style="color: rgb(112, 112, 112); margin-bottom: 0px; margin-left: 30px; font-size:88%;">  <i class="fa fa-th-large mr-3 fa-fw" style="color:#515b9d"> </i>  &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;  Logout </p>
           </a>
         </li>
@@ -534,7 +534,7 @@
 <!-- <div class="div15"> -->
   <!-- <img src="./static/temp.jpeg" height="125" width="300" style="margin-left:700px; margin-top:-11px;">  -->
 
-  <p style="color: #515b9d; margin-bottom: 0px; margin-left: 20px;  font-size:50%;"> Hello John Doe </p>
+  <p style="color: #515b9d; margin-bottom: 0px; margin-left: 20px;  font-size:50%;"> Hello {{name if name else 'User'}} </p>
   <br>
   <p style="color: rgb(112, 112, 112); margin-bottom: 0px; margin-left: 20px; margin-top: -58px; font-size:28%;"> Have a nice day at work! </p>
 <!-- </div> -->
@@ -542,17 +542,45 @@
 
 <br>
 
-<!--med starts-->
-<div class="div12">
-
-
-     <!-- <img src="." height="90px" width="165" style="margin-left:-40px; margin-top:-5px;">  -->
-     <p style="margin-left: 50px; margin-top:15px; color: #515b9d; font-size:15px;"> Prescription 1 </p>
-     <p style="margin-left: 50px; margin-top:-10px; color: #515b9d; font-size:12px;"> 25/12/22 12:00 pm </p>
-     <form> <a href=""> <button type="submit" class="btn lightpurple four1">  <p style="color: #515b9d; margin-bottom: 0px; font-size:70%;"> View </p></button> </a> </form> 
-     <form> <a href=""> <button type="submit" class="btn lightgreen five1">  <p style="color: rgb(31, 110, 82); margin-bottom: 0px; font-size:70%;"> Delete </p></button> </a> </form> 
-
+<!--Status messages-->
+{% if upload_status == 'success' %}
+<div class="alert alert-success" role="alert" style="margin: 20px 50px;">
+  Prescription uploaded successfully!
 </div>
+{% elif upload_status == 'error' %}
+<div class="alert alert-danger" role="alert" style="margin: 20px 50px;">
+  Error uploading prescription. Please try again.
+</div>
+{% endif %}
+
+{% if delete_status == 'success' %}
+<div class="alert alert-success" role="alert" style="margin: 20px 50px;">
+  Prescription deleted successfully!
+</div>
+{% elif delete_status == 'error' %}
+<div class="alert alert-danger" role="alert" style="margin: 20px 50px;">
+  Error deleting prescription. Please try again.
+</div>
+{% endif %}
+
+<!--med starts-->
+{% if prescriptions %}
+  {% for id, prescription in prescriptions.items() %}
+  <div class="div12">
+     <p style="margin-left: 50px; margin-top:15px; color: #515b9d; font-size:15px;"> Prescription {{loop.index}} </p>
+     <p style="margin-left: 50px; margin-top:-10px; color: #515b9d; font-size:12px;"> {{prescription.date}} </p>
+     <a href="/dashboard/view/{{id}}"> <button type="button" class="btn lightpurple four1">  <p style="color: #515b9d; margin-bottom: 0px; font-size:70%;"> View </p></button> </a>
+     <a href="/dashboard/delete/{{id}}" onclick="return confirm('Are you sure you want to delete this prescription?')"> <button type="button" class="btn lightgreen five1">  <p style="color: rgb(31, 110, 82); margin-bottom: 0px; font-size:70%;"> Delete </p></button> </a>
+  </div>
+  <br>
+  {% endfor %}
+{% else %}
+<div class="div12">
+     <p style="margin-left: 50px; margin-top:15px; color: #515b9d; font-size:15px;"> No prescriptions yet </p>
+     <p style="margin-left: 50px; margin-top:-10px; color: #515b9d; font-size:12px;"> Upload your first prescription to get started </p>
+     <a href="/dashboard/upload"> <button type="button" class="btn lightpurple four1">  <p style="color: #515b9d; margin-bottom: 0px; font-size:70%;"> Upload </p></button> </a>
+</div>
+{% endif %}
 
         </div> 
       </div> 

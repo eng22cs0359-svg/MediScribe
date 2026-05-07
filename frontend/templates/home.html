@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>MediScribe - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
@@ -94,8 +94,8 @@
     <div>
         <nav class="navbar navbar-expand-lg fixed-top flex-md-nowrap p-0 shadows white2" style="margin: 20px; margin-left: 150px;">
           <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <img src="../static/logo.png" alt="Bootstrap" width="170" height="40">
+            <a class="navbar-brand" href="/" style="font-size: 24px; font-weight: bold; color: #6437b8;">
+                MediScribe
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -124,7 +124,7 @@
             <div class="row">
             <div class="col-8">
                 <br><br><br><br>
-                <H1 style="margin-left: 30px; font-size:50px;"> Translate your handwritten <br> text into a readable format, <br> with Scan Plus+</H1>
+                <H1 style="margin-left: 30px; font-size:50px;"> Translate your handwritten <br> text into a readable format, <br> with MediScribe</H1>
                 <p style="color:rgb(95, 95, 95); margin-left: 30px; font-size:20px; margin-top: 10px;"> Create and save your prescription from any device, anywhere.</p>
                 <br> 
                 <form action="/scan" method = "get">
@@ -165,7 +165,7 @@
     <div class="container"> 
     <div class="container py-5">
      
-       <span class="badge text-bg-light block margin-auto"> <h4 style="font-size:15px; margin:3.5px; color:rgb(51, 51, 51);">Dr. Reddy's ScanPlus+</h4></span> 
+       <span class="badge text-bg-light block margin-auto"> <h4 style="font-size:15px; margin:3.5px; color:rgb(51, 51, 51);">MediScribe</h4></span> 
       
     </div>
     <!--row 3 starts-->
@@ -179,16 +179,157 @@
       <br> <br> 
     </div>
     </section>
-    <section id="video" v-show="video" style="display:flex; justify-content: center; margin-bottom: 100px;">
-    <br>
-
-    
-      <video width="1100" height="640" controls id="video">
-        <source src="../static/how_it_works.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      <br><br><br>
+    <section id="video" style="margin-bottom: 100px;">
+      <div class="typewriter-container">
+        <div class="typewriter-content">
+          <h2 class="typewriter-title">Transform Healthcare Documentation...</h2>
+          <p class="typewriter-text" id="typewriter"></p>
+          <span class="cursor" id="cursor">|</span>
+        </div>
+      </div>
     </section>
+
+    <style>
+      .typewriter-container {
+        background: linear-gradient(135deg, #f3e7ff 0%, #e8d9ff 100%);
+        border-radius: 20px;
+        padding: 60px 40px;
+        margin: 40px auto;
+        max-width: 1100px;
+        box-shadow: 0 10px 40px rgba(100, 55, 184, 0.15);
+        border: 2px solid rgba(100, 55, 184, 0.1);
+      }
+
+      .typewriter-content {
+        text-align: left;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .typewriter-title {
+        font-size: 42px;
+        font-weight: bold;
+        color: #6437b8;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .typewriter-text {
+        font-family: 'Courier New', monospace;
+        font-size: 18px;
+        line-height: 1.8;
+        color: #333;
+        min-height: 400px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .cursor {
+        font-family: 'Courier New', monospace;
+        font-size: 18px;
+        color: #6437b8;
+        animation: blink 0.7s infinite;
+        font-weight: bold;
+      }
+
+      @keyframes blink {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+      }
+
+      @media (max-width: 768px) {
+        .typewriter-container {
+          padding: 40px 20px;
+        }
+        
+        .typewriter-title {
+          font-size: 28px;
+        }
+        
+        .typewriter-text {
+          font-size: 16px;
+        }
+      }
+    </style>
+
+    <script>
+      // Wait for DOM to be fully loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        // Typewriter effect with compelling problem-solution narrative
+        const text = `THE PROBLEM:
+
+Every year, medical errors due to illegible handwriting cause thousands of preventable incidents. Doctors' handwritten prescriptions are often misread by pharmacists, leading to:
+
+❌ Wrong medication dispensed
+❌ Incorrect dosages administered  
+❌ Delayed treatment due to clarification needs
+❌ Patient safety risks
+❌ Increased healthcare costs
+
+Studies show that 7,000+ deaths occur annually due to medication errors, with illegible handwriting being a major contributor.
+
+---
+
+THE SOLUTION:
+
+MediScribe uses cutting-edge AI technology to eliminate handwriting confusion:
+
+✓ AWS Textract OCR - Extracts text with 99%+ accuracy
+✓ Medical NLP Engine - Understands medical terminology
+✓ Smart Pattern Recognition - Identifies medicines, dosages, frequencies
+✓ Instant Digitization - Converts prescriptions in seconds
+✓ Secure Cloud Storage - Access from anywhere, anytime
+
+---
+
+HOW IT WORKS:
+
+1. Upload your handwritten prescription
+2. Our AI analyzes and extracts information
+3. Get a clean, digital prescription with:
+   • Patient name
+   • Medicine names
+   • Dosages & frequencies
+   • Duration of treatment
+   • Doctor's instructions
+
+---
+
+Perfect for doctors, pharmacists, and patients who value accuracy and safety in healthcare.
+
+Start digitizing your prescriptions today - because clarity saves lives.`;
+
+        const typewriterElement = document.getElementById('typewriter');
+        const cursorElement = document.getElementById('cursor');
+        
+        // Check if elements exist
+        if (!typewriterElement || !cursorElement) {
+          console.error('Typewriter elements not found!');
+          return;
+        }
+        
+        console.log('Starting typewriter animation...');
+        
+        let index = 0;
+        const typewriterSpeed = 20; // milliseconds per character
+
+        function typeWriter() {
+          if (index < text.length) {
+            typewriterElement.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeWriter, typewriterSpeed);
+          } else {
+            // Stop cursor blinking when done
+            cursorElement.style.animation = 'none';
+            cursorElement.style.opacity = '0';
+            console.log('Typewriter animation complete!');
+          }
+        }
+
+        // Start typing after a small delay
+        setTimeout(typeWriter, 500);
+      });
+    </script>
    
     
     <!--row 4 ends-->
@@ -196,14 +337,86 @@
     </div>
     <footer style="background-color: #333; color: #fff; padding: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
-        <p> All Rights Reserved, Copyright © 2023</p>
+        <p> All Rights Reserved, Copyright © 2026</p>
         <ul style="list-style: none; margin: 0; padding: 0; display: flex;">
           <li style="margin: 0 10px;"><a href="#" style="color: #fff; text-decoration: none;">Privacy Policy</a></li>
           <li style="margin: 0 10px;"><a href="#" style="color: #fff; text-decoration: none;">Terms of Use</a></li>
           <li style="margin: 0 10px;"><a href="#" style="color: #fff; text-decoration: none;">Contact Us</a></li>
         </ul>
       </div>
-    </footer> 
-    
+    </footer>
+
+<!-- AI Agent Chatbot Widget -->
+<div id="chat-widget" style="position:fixed;bottom:24px;right:24px;z-index:9999;font-family:'Segoe UI',sans-serif;">
+  <button id="chat-toggle" onclick="toggleChat()"
+    style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6437b8,#764ba2);
+           border:none;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(100,55,184,0.4);">
+    💊
+  </button>
+  <div id="chat-box" style="display:none;width:340px;background:#fff;border-radius:16px;
+       box-shadow:0 8px 32px rgba(0,0,0,0.18);overflow:hidden;margin-bottom:12px;">
+    <div style="background:linear-gradient(135deg,#6437b8,#764ba2);padding:14px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700;font-size:15px;">💊 MediScribe Assistant</div>
+        <div style="font-size:11px;opacity:0.85;">Ask me anything about MediScribe</div>
+      </div>
+      <span onclick="toggleChat()" style="cursor:pointer;font-size:18px;">✕</span>
+    </div>
+    <div id="chat-messages" style="height:280px;overflow-y:auto;padding:14px;background:#f8f6ff;">
+      <div style="background:#ede9ff;border-radius:12px 12px 12px 2px;padding:10px 14px;margin-bottom:10px;font-size:13px;max-width:85%;color:#333;">
+        Hi! I'm your MediScribe assistant 👋<br>
+        Ask me how to use the site, about features, or anything else!
+      </div>
+    </div>
+    <div style="display:flex;padding:10px 14px 14px;background:#fff;gap:8px;">
+      <input id="chat-input" type="text" placeholder="Type a message..."
+        onkeydown="if(event.key==='Enter') sendMessage()"
+        style="flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:10px;font-size:13px;outline:none;">
+      <button onclick="sendMessage()"
+        style="background:linear-gradient(135deg,#6437b8,#764ba2);color:#fff;border:none;
+               border-radius:10px;padding:9px 14px;cursor:pointer;font-size:14px;">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleChat() {
+    const box = document.getElementById('chat-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+  function addMessage(text, isUser) {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.style.cssText = isUser
+      ? 'background:#6437b8;color:#fff;border-radius:12px 12px 2px 12px;padding:10px 14px;margin-bottom:10px;font-size:13px;max-width:85%;margin-left:auto;'
+      : 'background:#ede9ff;color:#333;border-radius:12px 12px 12px 2px;padding:10px 14px;margin-bottom:10px;font-size:13px;max-width:85%;';
+    div.innerHTML = text.replace(/\n/g, '<br>');
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+  function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    addMessage(msg, true);
+    input.value = '';
+    const msgs = document.getElementById('chat-messages');
+    const typing = document.createElement('div');
+    typing.id = 'typing';
+    typing.style.cssText = 'background:#ede9ff;color:#888;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px;max-width:85%;';
+    typing.innerHTML = '⏳ Thinking...';
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+    fetch('/agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, medicines: [], email: '' })
+    })
+    .then(r => r.json())
+    .then(data => { document.getElementById('typing')?.remove(); addMessage(data.reply, false); })
+    .catch(() => { document.getElementById('typing')?.remove(); addMessage('Sorry, something went wrong.', false); });
+  }
+</script>
+
 </body>
 </html>

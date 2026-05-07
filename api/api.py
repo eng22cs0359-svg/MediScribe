@@ -16,7 +16,21 @@ from htmlbody import *
 from apscheduler.schedulers.background import BackgroundScheduler
 import base64
 
-from ml_model.ner import *
+from ml_model.ner import InitiateNER
+from ml_model.ml_model import detect_text
+
+# Import configuration
+try:
+    from config import *
+except ImportError:
+    # Fallback to environment variables if config.py doesn't exist
+    AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'super-secret')
+    SQLALCHEMY_DATABASE_URI = "sqlite:///database.sqlite"
+    UPLOAD_FOLDER_PFP = "images/pfp"
+    UPLOAD_FOLDER_PRESCRIPTIONS = "images/prescriptions"
 
 import jwt
 from flask_jwt_extended import create_access_token
@@ -38,18 +52,18 @@ scheduler.start()
 
 app.config["JWT_COOKIE_SECURE"] = False
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
-app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this in your code!
+app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
 
 jwt = JWTManager(app)
 
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.sqlite"
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 
-upload_folder_pfp = "images/pfp"
+upload_folder_pfp = UPLOAD_FOLDER_PFP
 app.config["UPLOAD_FOLDER_PFP"] = upload_folder_pfp
 
-upload_folder_prescriptions = "images/prescriptions"
+upload_folder_prescriptions = UPLOAD_FOLDER_PRESCRIPTIONS
 app.config["UPLOAD_FOLDER_prescriptions"] = upload_folder_prescriptions
 
 db.init_app(app)
@@ -91,7 +105,7 @@ def encoding_image(path):
 class SignUp(Resource):
     def post(self):
         fname = request.form['full_name']
-        email = request.form['email'].encode('utf-8')
+        email = request.form['email']
         pwd = request.form['password']
         isEmpty = App_user.query.filter_by(email = email).first()
         if isEmpty:
@@ -107,14 +121,14 @@ class SignUp(Resource):
 
 class Login(Resource):
     def post(self):
-        email = request.form['email'].encode('utf-8')
+        email = request.form['email']
         pwd = request.form['password'].encode('utf-8')
         find_user = App_user.query.filter_by(email = email).first()
         if find_user:
             user_pass = find_user.password
             if bcrypt.checkpw(pwd, user_pass):
                 # token = jwt.encode({'user': str(find_user.email, 'UTF-8'), 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-                token = create_access_token(identity=str(find_user.email, 'UTF-8'))
+                token = create_access_token(identity=find_user.email)
                 response = jsonify({"msg": "login successful"})
                 set_access_cookies(response, token)
                 print(token)
@@ -127,59 +141,86 @@ class Login(Resource):
 class PrescriptionUpload(Resource):
     @jwt_required()
     def post(self):
-        # try:
-        email = request.form['email']
-        pic_name = request.form['pic_name']
+        try:
+            email = request.form['email']
+            pic_name = request.form['pic_name']
+            
+            # Ensure email is string, not bytes
+            if isinstance(email, bytes):
+                email = email.decode('utf-8')
+            
+            print(f"PrescriptionUpload - Email: {email}, Pic: {pic_name}")
 
-        q = Prescription(prescription_name = pic_name, user_email = email)
-        db.session.add(q)
-        db.session.commit()
-        
-        
-        x = (ner_model.predict(detect_text(os.path.join(app.config['UPLOAD_FOLDER_prescriptions'], pic_name))))
+            q = Prescription(prescription_name = pic_name, user_email = email)
+            db.session.add(q)
+            db.session.commit()
+            
+            print(f"Prescription saved to database with ID: {q.id}")
+            
+            # Return success without processing (already processed in frontend)
+            return make_response(jsonify({"status": "success", "id": q.id}), 200)
 
-        # medicine = x["Medicine"]
-        # msg = """Your Current Medication - 
-        # """
-        counter = 0
-        # for i in medicine:
-        #     msg = msg + str(counter) + ") " + i + "\n"
-
-        # job = scheduler.add_job(send_mail,'interval', [msg, email], hour = "10")
-
-        return json.dumps(x)
-
-        # except:
-        #     abort(500)
+        except Exception as e:
+            print(f"PrescriptionUpload error: {e}")
+            import traceback
+            traceback.print_exc()
+            db.session.rollback()
+            return make_response(jsonify({"error": str(e)}), 500)
 
 class Dashboard(Resource):
     @jwt_required()
     def get(self):
         try:
-        #uname = request.form["email"]
-        # print(auth.current_user())
-            email = get_jwt_identity().encode("utf-8")
-            print(email)
+            email = get_jwt_identity()
+            
+            # Ensure email is string for database query
+            if isinstance(email, bytes):
+                email = email.decode("utf-8")
+            
+            print(f"Dashboard - Looking up user: {email}")
             user = App_user.query.filter_by(email = email).first()
+            
+            if not user:
+                print(f"User not found: {email}")
+                return make_response("User not found", 404)
+            
             uname = user.email
-            # find_user = App_user.query.filter_by(email = uname).first()
-            # if not find_user:
-            #     abort(401)
+            
+            # Get prescriptions
             presciptions = Prescription.query.filter_by(user_email = uname).all()
-            print(presciptions)
+            print(f"Found {len(presciptions)} prescriptions")
+            
             presciptions_dict = {}
             for i in presciptions:
                 temp = {}
-                temp["id"] = i.id,
-                temp["prescription_name"] =  i.prescription_name,
-                temp["date"] = i.time_stamp.strftime('%m/%d/%Y'),
-                print("./images/prescriptions/"+i.prescription_name)
-                temp["image"] = encoding_image("./images/prescriptions/"+i.prescription_name),
+                temp["id"] = i.id
+                temp["prescription_name"] = i.prescription_name
+                temp["date"] = i.time_stamp.strftime('%m/%d/%Y')
+                
+                image_path = "./images/prescriptions/"+i.prescription_name
+                print(f"Encoding image: {image_path}")
+                
+                try:
+                    temp["image"] = encoding_image(image_path)
+                except Exception as e:
+                    print(f"Error encoding image {image_path}: {e}")
+                    temp["image"] = ""
+                
                 presciptions_dict[i.id] = temp
-            print(presciptions_dict)
-            return jsonify({"name": user.full_name, "pfp": user.profile_pic, "number_of_prescription": user.number_of_prescription, "prescriptions": presciptions_dict})
-        except:
-            abort(500)
+            
+            print(f"Returning {len(presciptions_dict)} prescriptions")
+            return jsonify({
+                "name": user.full_name, 
+                "pfp": user.profile_pic, 
+                "number_of_prescription": len(presciptions_dict), 
+                "prescriptions": presciptions_dict
+            })
+            
+        except Exception as e:
+            print(f"Dashboard error: {e}")
+            import traceback
+            traceback.print_exc()
+            return make_response(str(e), 500)
 
 class ViewPrescription(Resource):
     @jwt_required()
@@ -225,9 +266,25 @@ class SendMail(Resource):
 class Scan(Resource):
     def post(self):
         file_path = request.form['path']
-        x = (ner_model.predict(detect_text(file_path)))
+        
+        # Extract text from image using AWS Textract
+        extracted_text = detect_text(file_path, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+        
+        # Extract entities using AWS Comprehend Medical
+        aws_results = ner_model.predict(extracted_text)
+        
+        # Post-process with advanced NLP for better accuracy
+        from ml_model.prescription_nlp import PrescriptionNLP
+        nlp_processor = PrescriptionNLP()
+        improved_results = nlp_processor.process(aws_results, extracted_text)
+        
+        # Add the full extracted text to the response
+        improved_results['extracted_text'] = extracted_text
+        
+        # Also include raw AWS results for comparison
+        improved_results['aws_raw'] = aws_results
 
-        return json.dumps(x)
+        return json.dumps(improved_results)
 
 class Schedule(Resource):
     def post(self):
@@ -248,6 +305,14 @@ api.add_resource(Schedule, "/schedule")
 if __name__=="__main__":
     db.create_all()
     
-    ner_model = InitiateNER()
-    ner_model.load_model("./content/model")
+    # Initialize NER model with AWS Comprehend Medical
+    print("Initializing AWS Comprehend Medical NER...")
+    ner_model = InitiateNER(
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+    )
+    ner_model.load_model()  # For compatibility (does nothing for AWS)
+    print("NER model ready!")
+    
     app.run(debug=True)
